@@ -5,10 +5,10 @@ from faker import Faker
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-FORM_RESPONSES = 10
+FORM_RESPONSES = 20
 FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdlgw7gYP9NHJtg15MWGTQGkW4yeIGbyWIe1X7MFKsgt8VD3A/viewform"
-INIT_PAUSE = 6
-EVENT_PAUSE = 1.5
+INIT_PAUSE = 4
+EVENT_PAUSE = 1
 
 fake = Faker("en_IN")
 driver = webdriver.Chrome()
@@ -16,12 +16,12 @@ driver.get(FORM_URL)
 
 
 def radio_select_element(starting_id, option_count, default_select=None, radio_distance=3, description=""):
-    print(f"In radio element: {description}")
     if default_select is None:
         default_select = randint(0, option_count - 1)
     selected_id = starting_id + (radio_distance * default_select)
     driver.find_element(by=By.ID, value=f'i{selected_id}').click()
     sleep(EVENT_PAUSE)
+    print(f"Chose option: {default_select+1}, id: {selected_id}, radio element: {description}")
     return default_select
 
 
@@ -35,7 +35,7 @@ def text_element(xpath_id, text):
 
 def get_gender():
     # returns 0 for male and 1 for female
-    return 1 if randint(0, 4) % 2 else 0
+    return 1 if randint(1, 2) % 2 else 0
 
 
 def submit_form_reopen(submit_button_xpath):
@@ -50,7 +50,7 @@ for _ in range(FORM_RESPONSES):
     sleep(INIT_PAUSE)
     is_female = get_gender()
 
-    name = fake.unique.name_female() if is_female else fake.unique.name_male()
+    name = fake.name_female() if is_female else fake.name_male()
     text_element('i1', name)
 
     radio_select_element(starting_id=9, option_count=2, default_select=is_female, description="gender")
@@ -59,7 +59,7 @@ for _ in range(FORM_RESPONSES):
 
     radio_select_element(starting_id=35, option_count=5, description="social media")
 
-    radio_select_element(starting_id=57, option_count=6, description="influencer type")
+    radio_select_element(starting_id=54, option_count=6, description="influencer type")
 
     radio_select_element(starting_id=76, option_count=5, description="influencer factors")
 
@@ -94,5 +94,6 @@ for _ in range(FORM_RESPONSES):
     radio_select_element(starting_id=252, option_count=2, description="helped")
 
     submit_form_reopen('//div[@jsname="M2UYVd"]')
+    print("\n\n---------------------------Alhamdulillah-------------------------------\n\n")
 
 driver.quit()
