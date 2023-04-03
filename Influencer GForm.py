@@ -5,7 +5,7 @@ from faker import Faker
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-FORM_RESPONSES = 20
+FORM_RESPONSES = 100
 FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdlgw7gYP9NHJtg15MWGTQGkW4yeIGbyWIe1X7MFKsgt8VD3A/viewform"
 INIT_PAUSE = 4
 EVENT_PAUSE = 1
