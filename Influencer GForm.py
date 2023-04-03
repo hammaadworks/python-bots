@@ -21,7 +21,7 @@ def radio_select_element(starting_id, option_count, default_select=None, radio_d
     selected_id = starting_id + (radio_distance * default_select)
     driver.find_element(by=By.ID, value=f'i{selected_id}').click()
     sleep(EVENT_PAUSE)
-    print(f"Chose option: {default_select+1}, id: {selected_id}, radio element: {description}")
+    print(f"Chose option: {default_select + 1}, id: {selected_id}, radio element: {description}")
     return default_select
 
 
@@ -47,7 +47,8 @@ def submit_form_reopen(submit_button_xpath):
     sleep(EVENT_PAUSE)
 
 
-for _ in range(FORM_RESPONSES):
+for i in range(FORM_RESPONSES):
+    print(f"Filling form {i + 1}/{FORM_RESPONSES}")
     sleep(INIT_PAUSE)
     is_female = get_gender()
 
@@ -95,6 +96,7 @@ for _ in range(FORM_RESPONSES):
     radio_select_element(starting_id=252, option_count=2, description="helped")
 
     submit_form_reopen('//div[@jsname="M2UYVd"]')
+    print(f"Done Filling form {i + 1}/{FORM_RESPONSES}")
     print("\n\n---------------------------Alhamdulillah-------------------------------\n\n")
 
 driver.quit()
