@@ -25,11 +25,12 @@ def radio_select_element(starting_id, option_count, default_select=None, radio_d
     return default_select
 
 
-def text_element(xpath_id, text):
+def text_element(xpath_id, text, description=""):
     text_field = driver.find_element(by=By.XPATH, value=f'//input[@aria-labelledby="{xpath_id}"]')
     text_field.click()
     sleep(EVENT_PAUSE)
     text_field.send_keys(text)
+    print(f"Typed {text} on text element: {description}")
     sleep(EVENT_PAUSE)
 
 
@@ -51,7 +52,7 @@ for _ in range(FORM_RESPONSES):
     is_female = get_gender()
 
     name = fake.name_female() if is_female else fake.name_male()
-    text_element('i1', name)
+    text_element(xpath_id='i1', text=name, description="name")
 
     radio_select_element(starting_id=9, option_count=2, default_select=is_female, description="gender")
 
