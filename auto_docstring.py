@@ -1,9 +1,11 @@
 import os
 import time
 import google.generativeai as genai
+import subprocess
+from typing import Any
 
 # Configure the generative AI API
-genai.configure(api_key="your_api_key_here")
+genai.configure(api_key="GEMINI_API_KEY")
 
 model = genai.GenerativeModel(model_name="gemini-2.0-flash-exp")
 
@@ -16,10 +18,10 @@ def generate_docstring(code: str) -> str:
     where they are missing, adhering to the Google docstring style.
 
     Args:
-        code: The Python code to process as a string.
+        code (str): The Python code to process as a string.
 
     Returns:
-        The updated Python code with generated docstrings as a string.
+        str: The updated Python code with generated docstrings as a string.
     """
     prompt = (
         "You are an expert Python developer. Add high-quality, detailed, and professional Google-style docstrings to the following Python code. "
@@ -35,16 +37,31 @@ def generate_docstring(code: str) -> str:
     )
     return response.text.strip()
 
-def process_file(file_path: str) -> None:
+def format_code(file_path: str) -> None:
     """
-    Processes a single Python file to generate and overwrite existing docstrings.
+    Formats the given Python file according to PEP8 and Google Python Style Guide.
 
-    This function reads a Python file, uses `generate_docstring` to update the docstrings,
-    and then overwrites the original file with the updated code. Includes a rate-limiting
-    mechanism to avoid API throttling.
+    This function uses the `black` and `isort` tools to automatically format the code.
 
     Args:
-        file_path: The path to the Python file as a string.
+        file_path (str): The path to the Python file as a string.
+    """
+    try:
+        subprocess.run(["black", file_path], check=True)
+        subprocess.run(["isort", file_path], check=True)
+        print(f"Formatted: {file_path}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error formatting {file_path}: {e}")
+
+def process_file(file_path: str) -> None:
+    """
+    Processes a single Python file to generate and overwrite existing docstrings, and format the file.
+
+    This function reads a Python file, uses `generate_docstring` to update the docstrings,
+    formats the file, and then overwrites the original file with the updated code.
+
+    Args:
+        file_path (str): The path to the Python file as a string.
     """
     with open(file_path, "r") as file:
         code = file.read()
@@ -56,18 +73,19 @@ def process_file(file_path: str) -> None:
     with open(file_path, "w") as file:
         file.write(updated_code)
 
-    print(f"Processed: {file_path}")
+    # Format the file according to best practices
+    format_code(file_path)
 
 def process_project(directory: str) -> None:
     """
-    Processes all Python files in the given directory to generate and overwrite docstrings.
+    Processes all Python files in the given directory to generate and overwrite docstrings, and format the files.
 
     This function recursively traverses the given directory, identifies all Python files, and
-    calls `process_file` to update the docstrings for each one. Errors during file processing
-    are caught and reported. Includes a rate-limiting mechanism to avoid API throttling.
+    calls `process_file` to update the docstrings and format each file. Errors during file
+    processing are caught and reported. Includes a rate-limiting mechanism to avoid API throttling.
 
     Args:
-        directory: The path to the project directory as a string.
+        directory (str): The path to the project directory as a string.
     """
     for root, _, files in os.walk(directory):
         for file in files:
@@ -90,7 +108,7 @@ def main() -> None:
     project_directory = input("Enter the path to your Python project: ").strip()
     if os.path.isdir(project_directory):
         process_project(project_directory)
-        print("Documentation generation complete!")
+        print("Documentation generation and formatting complete!")
     else:
         print("Invalid directory. Please try again.")
 
