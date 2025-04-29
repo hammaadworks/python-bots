@@ -83,7 +83,14 @@ def generate_docstring(code):
     """Generate professional Google-style docstrings with retries."""
     prompt = f"""
     You are an expert developer. Add high-quality Google-style docstrings to this code:
+    ```
     {code}
+    ```
+    Rule:
+    1. Return the documented code enclosed within triple quotes.
+    2. Never change the application logic.
+    3. Follow clean code principles and best coding practices while formatting. 
+    4. Only return the code and nothing else.
     """
     retries = 5
     retry_delay = 2  # Initial delay in seconds
@@ -122,6 +129,8 @@ def process_file(file_path):
         with open(file_path, "r") as file:
             code = file.read()
         updated_code = generate_docstring(code)
+        # Removing the ```python backticks
+        updated_code = "\n".join(updated_code.strip().splitlines()[1:-1])
         with open(file_path, "w") as file:
             file.write(updated_code)
         format_code(file_path)
@@ -132,7 +141,8 @@ def process_file(file_path):
 def process_project(directory):
     """Process all supported code files in a project directory."""
     ignored_patterns = read_gitignore(directory)
-    supported_extensions = {".py", ".java", ".js", ".html", ".css"}
+    # supported_extensions = {".py", ".java", ".js", ".html", ".css"}
+    supported_extensions = {".py"}
 
     for root, dirs, files in os.walk(directory):
         dirs[:] = [d for d in dirs if
